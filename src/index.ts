@@ -1,5 +1,6 @@
 import cluster from "node:cluster";
 import { availableParallelism } from "node:os";
+import { URL } from "node:url";
 import express from "express";
 import axios from "axios";
 import solve from "../ejs/src/yt/solver/main";
@@ -79,7 +80,7 @@ if (cluster.isPrimary) {
     const player = await getCached("player", playerUrl);
     if (player !== null) return player;
     try {
-      const { data } = await axios.get<string>(playerUrl);
+      const { data } = await axios.get<string>(new URL(playerUrl, "https://www.youtube.com").href);
       updateCache("player", playerUrl, data);
       const sts = data.match(signature)?.[2];
       if (sts !== undefined) updateCache("sts", playerUrl, sts);
