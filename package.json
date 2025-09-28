@@ -5,7 +5,8 @@
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsup",
-    "start": "node lib/index.js"
+    "start": "node lib/index.js",
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
