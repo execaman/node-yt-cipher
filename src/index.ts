@@ -2,10 +2,10 @@ import cluster from "node:cluster";
 import { availableParallelism } from "node:os";
 import express from "express";
 import axios from "axios";
-import solve from "../ejs/src/main";
+import solve from "../ejs/src/yt/solver/main";
 
 import type { Worker } from "node:cluster";
-import type { Input } from "../ejs/src/main";
+import type { Input } from "../ejs/src/yt/solver/main";
 
 interface BasePayload {
   key: string;
