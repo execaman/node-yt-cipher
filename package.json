@@ -6,12 +6,11 @@
   "scripts": {
     "build": "tsup",
     "start": "node lib/index.js",
-    "prepare": "husky || true"
+    "submodule": "git submodule update --init --recursive"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
-    "husky": "^9.1.7",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
   },
