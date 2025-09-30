@@ -44,6 +44,7 @@ if (cluster.isPrimary) {
     const map = payload.op === "player" ? player : payload.op === "processed" ? processed : sts;
     if (payload.value !== undefined) map.set(payload.key, payload.value);
     else this.send({ id: `${payload.op}:${payload.key}`, data: map.get(payload.key) ?? null } satisfies WorkerMessage);
+    if (sts.has(payload.key) && processed.has(payload.key)) player.delete(payload.key);
   }
   function onError(this: Worker, err: Error) {
     console.log(`Worker ${this.id} errored:`, err);
