@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsup",
     "start": "node lib/index.js",
-    "submodule": "git submodule update --init --recursive"
+    "submodule": "git submodule update --init --recursive",
+    "submodule:update": "git submodule update --remote"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
