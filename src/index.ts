@@ -34,6 +34,10 @@ interface WorkerMessage {
 
 if (cluster.isPrimary) {
   process.loadEnvFile();
+  const env = {
+    PORT: process.env.PORT,
+    AUTH: process.env.AUTH,
+  };
   const sts = new Map<string, string>();
   const player = new Map<string, string>();
   const processed = new Map<string, string>();
@@ -51,7 +55,7 @@ if (cluster.isPrimary) {
   }
   function onExit(this: Worker, code: number) {
     console.log(`Worker ${this.id} exited with code ${code}`);
-    if (code !== 0) attachEvents(cluster.fork({ env: process.env }));
+    if (code !== 0) attachEvents(cluster.fork({ env }));
   }
   function attachEvents(worker: Worker) {
     worker.on("online", onOnline);
@@ -59,7 +63,8 @@ if (cluster.isPrimary) {
     worker.on("error", onError);
     worker.on("exit", onExit);
   }
-  for (let i = availableParallelism(); i; --i) attachEvents(cluster.fork({ env: process.env }));
+  let workers = Math.max(1, Number.parseInt(process.env.WORKERS!, 10)) || availableParallelism();
+  while (workers !== 0) attachEvents(cluster.fork({ env })), --workers;
 } else {
   const signature = /(signatureTimestamp|sts):(\d+)/;
   const resolvers = new Map<string, PromiseWithResolvers<string | null>>();
@@ -145,7 +150,7 @@ if (cluster.isPrimary) {
     if (_sts !== undefined) return res.status(200).json({ sts: _sts });
     return res.sendStatus(500);
   });
-  app.listen(process.env.PORT, (err) => {
+  app.listen(Number.parseInt(process.env.PORT!, 10), (err) => {
     if (err !== undefined) console.error(err);
   });
 }
