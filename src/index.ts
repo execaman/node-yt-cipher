@@ -3,10 +3,9 @@ import { availableParallelism } from "node:os";
 import { URL } from "node:url";
 import express from "express";
 import axios from "axios";
-import solve from "../ejs/src/yt/solver/main";
+import { getFromPrepared, preprocessPlayer } from "../ejs/src/yt/solver/solvers";
 
 import type { Worker } from "node:cluster";
-import type { Input } from "../ejs/src/yt/solver/main";
 
 interface BasePayload {
   key: string;
@@ -96,6 +95,19 @@ if (cluster.isPrimary) {
       return null;
     }
   };
+  const getSolvers = async (player_url: string) => {
+    try {
+      const cached = await getCached("processed", player_url);
+      if (cached !== null) return getFromPrepared(cached);
+      const player = await retrieveOrRequest(player_url);
+      if (player === null) return null;
+      const preprocessed = preprocessPlayer(player);
+      updateCache("processed", player_url, preprocessed);
+      return getFromPrepared(preprocessed);
+    } catch {
+      return null;
+    }
+  };
   const app = express();
   app.use(express.json());
   app.use((req, res, next) => {
@@ -110,28 +122,39 @@ if (cluster.isPrimary) {
       if (!req.body) throw 400;
       const { encrypted_signature, n_param, player_url } = req.body;
       if (!encrypted_signature || !n_param || !player_url) throw 400;
-      const cached = await getCached("processed", player_url);
-      const player = cached ?? (await retrieveOrRequest(player_url));
-      if (player === null) throw 500;
-      const requests: Input["requests"] = [
-        { type: "n", challenges: [n_param] },
-        { type: "sig", challenges: [encrypted_signature] },
-      ];
-      const answer = solve(
-        cached === null
-          ? { type: "player", player, output_preprocessed: true, requests }
-          : { type: "preprocessed", preprocessed_player: cached, requests }
-      );
-      if (answer.type === "error") throw 500;
-      const output = { decrypted_signature: "", decrypted_n_sig: "" };
-      for (const _res of answer.responses) {
-        if (_res.type !== "result") continue;
-        if (_res.data[encrypted_signature]) output.decrypted_signature = _res.data[encrypted_signature];
-        if (_res.data[n_param]) output.decrypted_n_sig = _res.data[n_param];
-      }
-      if (!output.decrypted_n_sig || !output.decrypted_signature) throw 500;
-      if (answer.preprocessed_player) updateCache("processed", player_url, answer.preprocessed_player);
+      const solvers = await getSolvers(player_url);
+      const output = {
+        decrypted_signature: solvers?.sig?.(encrypted_signature),
+        decrypted_n_sig: solvers?.n?.(n_param),
+      };
+      if (!output.decrypted_signature || !output.decrypted_n_sig) throw 500;
       res.status(200).json(output);
+    } catch (code) {
+      if (typeof code !== "number") {
+        console.error(code);
+        res.sendStatus(500);
+      } else res.sendStatus(code);
+    }
+  });
+  app.post("/resolve_url", async (req, res) => {
+    try {
+      if (!req.body) throw 400;
+      const { encrypted_signature, signature_key, n_param, player_url, stream_url } = req.body;
+      if (!player_url || !stream_url) throw 400;
+      const url = new URL(stream_url);
+      const solvers = await getSolvers(player_url);
+      if (!solvers) throw 500;
+      if (encrypted_signature) {
+        if (!solvers.sig) throw 500;
+        url.searchParams.set(signature_key || "sig", solvers.sig(encrypted_signature));
+        url.searchParams.delete("s");
+      }
+      if (solvers.n) {
+        const n = n_param || url.searchParams.get("n");
+        if (!n) throw 400;
+        url.searchParams.set("n", solvers.n(n));
+      }
+      res.status(200).json({ resolved_url: url.toString() });
     } catch (code) {
       if (typeof code !== "number") {
         console.error(code);
