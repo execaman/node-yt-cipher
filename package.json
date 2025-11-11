@@ -1,13 +1,13 @@
 {
-  "name": "ytcipher",
+  "name": "yt-cipher",
   "type": "module",
   "version": "1.0.0",
   "main": "./lib/index.js",
   "scripts": {
     "build": "tsup",
     "start": "node lib/index.js",
-    "submodule": "git submodule update --init --recursive",
-    "submodule:update": "git submodule update --remote"
+    "sync:deps": "node scripts/deps.js",
+    "sync:mods": "git submodule update --init --remote --recursive --rebase"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
@@ -16,9 +16,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "astring": "^1.9.0",
     "axios": "^1.12.2",
     "express": "^5.1.0",
-    "meriyah": "^6.1.4"
+    "astring": "1.9.0",
+    "meriyah": "6.1.4"
   }
 }
