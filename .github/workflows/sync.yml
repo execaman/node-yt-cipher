@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: Commit update
-        if: steps.check.outputs.update
+        if: steps.check.outputs.update == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -49,7 +49,7 @@ jobs:
 
   update:
     needs: commit
-    if: needs.commit.outputs.update
+    if: needs.commit.outputs.update == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
