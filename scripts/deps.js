@@ -8,4 +8,4 @@ for (const dep in ejs.dependencies) {
   src.dependencies[dep] = ejs.dependencies[dep];
 }
 
-writeFileSync("package.json", JSON.stringify(src, null, 2), "utf8");
+writeFileSync("package.json", JSON.stringify(src, null, 2) + "\n", "utf8");
