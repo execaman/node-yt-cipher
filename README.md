@@ -1,7 +1,7 @@
 ## Setup
 
 - Clone this repository
-- Run `npm run submodule` to clone the ejs submodule
+- Run `npm run sync:mods` to bring submodules
 - Run `npm install` to install all dependencies
 - Configure the service in `.env` and run `npm start`
 
