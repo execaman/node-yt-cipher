@@ -3,14 +3,12 @@
   "compilerOptions": {
     "allowArbitraryExtensions": false,
     "allowImportingTsExtensions": false,
-    "allowJs": true,
-    "checkJs": true,
     "allowSyntheticDefaultImports": true,
     "allowUmdGlobalAccess": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": false,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "lib": ["ESNext"],
@@ -37,5 +35,5 @@
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": false
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*.ts"]
 }
