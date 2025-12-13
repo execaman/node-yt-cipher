@@ -6,8 +6,7 @@
   "scripts": {
     "build": "tsup",
     "start": "node lib/index.js",
-    "sync:deps": "node scripts/deps.js",
-    "sync:mods": "git submodule update --init --remote --recursive --rebase"
+    "sync:deps": "node scripts/deps.js"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",

@@ -1,13 +1,15 @@
 ## Setup
 
 - Clone this repository
-- Run `npm run sync:mods` to bring submodules
+- Run `git config submodule.recurse true`
+- Run `git pull` to clone the ejs subdmodule
 - Run `npm install` to install all dependencies
-- Configure the service in `.env` and run `npm start`
+- Configure the service in `.env`
 
 ## Maintain
 
-- Run `npm run sync:mods` to sync with ejs
-- Run `npm run sync:deps` to bring any new dependencies from ejs
+- A workflow keeps the branch up-to-date
+- You can run `git submodule update --remote` to update manually
+- Run `npm run sync:deps` after update to sync all dependencies
 - Run `npm run build` to build and ensure changes were compatible
-- The built file would be under `lib`
+- The built files would be under `lib`
